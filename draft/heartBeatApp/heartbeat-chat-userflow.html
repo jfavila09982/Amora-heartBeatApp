@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heartbeat Chat - User Flow</title>
+  <style>
+    :root {
+      --primary: #ff6b6b;
+      --primary-dark: #ff5252;
+      --secondary: #a5d8ff;
+      --bg: #fafafa;
+      --text: #333;
+      --light-text: #888;
+      --border: #eaeaea;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    
+    h1 {
+      margin-bottom: 40px;
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    h2 {
+      margin: 20px 0;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    
+    .flow-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+    
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: white;
+      padding: 15px 25px;
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .step-number {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+    
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .step-description {
+      max-width: 800px;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .screen-mock {
+      width: 100%;
+      max-width: 400px;
+      height: 700px;
+      background-color: white;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .screen-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .screen-welcome {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+    }
+    
+    .welcome-content {
+      text-align: center;
+      z-index: 2;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .heart-logo {
+      width: 60px;
+      height: 60px;
+      background-color: var(--primary);
+      transform: rotate(45deg);
+      position: relative;
+    }
+    
+    .heart-logo:before,
+    .heart-logo:after {
+      content: "";
+      width: 100%;
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 50%;
+      position: absolute;
+    }
+    
+    .heart-logo:before {
+      top: -50%;
+      left: 0;
+    }
+    
+    .heart-logo:after {
+      top: 0;
+      left: -50%;
+    }
+    
+    .app-name {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: white;
+    }
+    
+    .app-tagline {
+      font-size: 16px;
+      margin-bottom: 40px;
+      color: white;
+      opacity: 0.9;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 15px 30px;
+      background-color: white;
+      color: var(--primary);
+      border-radius: 50px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .floating-hearts {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+    
+    .floating-heart {
+      position: absolute;
+      font-size: 20px;
+      animation: float-up 15s linear infinite;
+      opacity: 0.6;
+    }
+    
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Connection Screen */
+    .screen-connect {
+      background-color: white;
+    }
+    
+    .connect-content {
+      text-align: center;
+      width: 100%;
+    }
+    
+    .connect-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    
+    .connect-description {
+      font-size: 14px;
+      margin-bottom: 40px;
+      color: var(--light-text);
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .connect-options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    
+    .connect-option {
+      padding: 20px;
+      border: 2px solid var(--border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .connect-option:hover {
+      border-color: var(--primary);
+      background-color: rgba(255, 107, 107, 0.05);
+    }
+    
+    .option-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(255, 107, 107, 0.1);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 20px;
+    }
+    
+    .option-info {
+      text-align: left;
+    }
+    
+    .option-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .option-desc {
+      font-size: 12px;
+      color: var(--light-text);
+    }
+    
+    /* Setup Profile Screen */
+    .screen-profile {
+      background-color: white;
+    }
+    
+    .profile-content {
+      width: 100%;
+    }
+    
+    .profile-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .profile-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    
+    .profile-subtitle {
+      font-size: 14px;
+      color: var(--light-text);
+    }
+    
+    .avatar-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .avatar-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    
+    .avatar-upload-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    
+    .avatar-text {
+      font-size: 14px;
+      color: var(--light-text);
+      margin-bottom: 20px;
+    }
+    
+    .profile-form {
+      width: 100%;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+    
+    /* Invitation Code Screen */
+    .screen-invite {
+      background-color: white;
+    }
+    
+    .invite-content {
+      width: 100%;
+      text-align: center;
+    }
+    
+    .invite-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    
+    .invite-subtitle {
+      font-size: 14px;
+      color: var(--light-text);
+      margin-bottom: 40px;
+    }
+    
+    .invite-code-container {
+      background-color: #f7f7f7;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .invite-code {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: var(--primary-dark);
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .share-options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .share-option {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .share-option:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    .invite-separator {
+      display: flex;
+      align-items: center;
+      margin: 30px 0;
+      color: var(--light-text);
+    }
+    
+    .invite-separator:before,
+    .invite-separator:after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: var(--border);
+    }
+    
+    .invite-separator:before {
+      margin-right: 15px;
+    }
+    
+    .invite-separator:after {
+      margin-left: 15px;
+    }
+    
+    .connect-input-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .connect-input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    .connect-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+    
+    /* Main interface preview screen */
+    .main-preview {
+      width: 100%;
+      max-width: 400px;
+      height: 700px;
+      background-color: white;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .main-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Features explanation */
+    .features-list {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 25px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(255, 107, 107, 0.1);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+    
+    .feature-content {
+      flex: 1;
+    }
+    
+    .feature-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    
+    .feature-desc {
+      font-size: 14px;
+      color: var(--light-text);
+      line-height: 1.6;
+    }
+    
+    /* Mobile-responsive adjustments */
+    @media (max-width: 768px) {
+      .flow-step {
+        padding: 0 10px;
+      }
+      
+      .step-description {
+        padding: 0 10px;
+      }
+    }
+    
+    /* Multi-screen layout */
+    .screens-container {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    /* Flow arrows */
+    .flow-arrow {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: var(--primary);
+      transform: rotate(90deg);
+    }
+    
+    @media (min-width: 992px) {
+      .screens-container {
+        flex-wrap: nowrap;
+      }
+      
+      .flow-arrow {
+        transform: rotate(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Heartbeat Chat - User Flow</h1>
+  
+  <div class="flow-container">
+    <!-- Step 1: Welcome Screen -->
+    <div class="flow-step">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">Welcome & Onboarding</div>
+      </div>
+      <div class="step-description">
+        New users are greeted with a warm welcome screen that introduces the app's purpose.
+        This is their first touchpoint with the app and sets the tone for the intimate, connected experience.
+      </div>
+      
+      <div class="screen-mock">
+        <div class="screen-content screen-welcome">
+          <!-- Floating hearts background animation -->
+          <div class="floating-hearts">
+            <span class="floating-heart" style="left: 10%; animation-duration: 12s;">❤️</span>
+            <span class="floating-heart" style="left: 25%; animation-duration: 15s; animation-delay: 2s;">💗</span>
+            <span class="floating-heart" style="left: 40%; animation-duration: 18s; animation-delay: 1s;">💕</span>
+            <span class="floating-heart" style="left: 60%; animation-duration: 14s; animation-delay: 3s;">💞</span>
+            <span class="floating-heart" style="left: 75%; animation-duration: 16s; animation-delay: 2.5s;">💓</span>
+            <span class="floating-heart" style="left: 85%; animation-duration: 13s; animation-delay: 1.5s;">❤️</span>
+          </div>
+          
+          <div class="welcome-content">
+            <div class="logo">
+              <div class="heart-logo"></div>
+            </div>
+            <div class="app-name">Heartbeat Chat</div>
+            <div class="app-tagline">Stay connected in real-time with your loved one</div>
+            <a href="#" class="btn">Get Started</a>
+            <div style="height: 10px;"></div>
+            <a href="#" class="btn btn-secondary">I Have an Invite</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2: Connection Options -->
+    <div class="flow-step">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">Connection Options</div>
+      </div>
+      <div class="step-description">
+        After the welcome screen, users choose how they want to connect with their partner.
+        They can either create a new connection or join an existing one using an invitation.
+      </div>
+      
+      <div class="screens-container">
+        <div class="screen-mock">
+          <div class="screen-content screen-connect">
+            <div class="connect-content">
+              <div class="connect-title">How would you like to connect?</div>
+              <div class="connect-description">Choose how you want to set up your Heartbeat Chat connection</div>
+              
+              <div class="connect-options">
+                <div class="connect-option">
+                  <div class="option-icon">✨</div>
+                  <div class="option-info">
+                    <div class="option-title">Create New Connection</div>
+                    <div class="option-desc">Start fresh and invite your partner</div>
+                  </div>
+                </div>
+                
+                <div class="connect-option">
+                  <div class="option-icon">🔗</div>
+                  <div class="option-info">
+                    <div class="option-title">Join with Code</div>
+                    <div class="option-desc">Enter the code your partner sent you</div>
+                  </div>
+                </div>
+                
+                <div class="connect-option">
+                  <div class="option-icon">📱</div>
+                  <div class="option-info">
+                    <div class="option-title">Connect via QR Code</div>
+                    <div class="option-desc">Scan your partner's QR code</div>
+                  </div>
+                </div>
+              </div>
+              
+              <a href="#" class="btn" style="width: 100%;">Continue</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 3: Setup Profile -->
+    <div class="flow-step">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">Profile Setup</div>
+      </div>
+      <div class="step-description">
+        Users set up their profile with basic details. This information will be visible to their partner 
+        in the connection interface. The profile is kept simple to focus on the connection rather than creating
+        a complex social profile.
+      </div>
+      
+      <div class="screen-mock">
+        <div class="screen-content screen-profile">
+          <div class="profile-content">
+            <div class="profile-header">
+              <div class="profile-title">Set Up Your Profile</div>
+              <div class="profile-subtitle">Let your partner know it's you</div>
+            </div>
+            
+            <div class="avatar-upload">
+              <div class="avatar-preview">
+                M
+                <div class="avatar-upload-btn">+</div>
+              </div>
+              <div class="avatar-text">Upload a profile photo</div>
+            </div>
+            
+            <div class="profile-form">
+              <div class="form-group">
+                <label class="form-label">Your Name</label>
+                <input type="text" class="form-input" placeholder="How your partner will see you">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Default Status</label>
+                <input type="text" class="form-input" placeholder="E.g., 'Thinking of you'">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Your Favorite Song (Optional)</label>
+                <input type="text" class="form-input" placeholder="Add a song to share">
+              </div>
+              
+              <a href="#" class="btn" style="width: 100%;">Continue</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 4: Generate & Share Invite -->
+    <div class="flow-step">
+      <div class="step-header">
+        <div class="step-number">4</div>
+        <div class="step-title">Generate & Share Invitation</div>
+      </div>
+      <div class="step-description">
+        After setting up their profile, users can generate a unique invitation code to share with their partner.
+        Alternatively, if they're joining an existing connection, they'll enter the code their partner shared.
+      </div>
+      
+      <div class="screens-container">
+        <!-- Share Invitation Screen -->
+        <div class="screen-mock">
+          <div class="screen-content screen-invite">
+            <div class="invite-content">
+              <div class="invite-title">Share Your Invitation</div>
+              <div class="invite-subtitle">Send this code to your partner to connect</div>
+              
+              <div class="invite-code-container">
+                <div class="invite-code">LOVE42</div>
+                <div class="copy-btn">📋</div>
+              </div>
+              
+              <div class="share-options">
+                <div class="share-option">📱</div>
+                <div class="share-option">✉️</div>
+                <div class="share-option">💬</div>
+              </div>
+              
+              <div class="invite-note" style="font-size: 14px; color: var(--light-text); margin-bottom: 30px;">
+                Your connection will be ready once they join
+              </div>
+              
+              <a href="#" class="btn" style="width: auto; padding-left: 40px; padding-right: 40px;">Done</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flow-arrow">➔</div>
+        
+        <!-- Enter Invitation Screen -->
+        <div class="screen-mock">
+          <div class="screen-content screen-invite">
+            <div class="invite-content">
+              <div class="invite-title">Enter Invitation Code</div>
+              <div class="invite-subtitle">Type the code your partner shared with you</div>
+              
+              <div class="connect-input-container">
+                <input type="text" class="connect-input" placeholder="Enter code (e.g. LOVE42)" style="text-align: center; font-size: 18px; letter-spacing: 3px;">
+              </div>
+              
+              <div class="invite-separator">OR</div>
+              
+              <div style="margin-bottom: 20px;">
+                <div style="font-size: 14px; color: var(--light-text); margin-bottom: 15px;">
+                  Scan QR code from your partner's device
+                </div>
+                <div style="width: 160px; height: 160px; background-color: #f7f7f7; border-radius: 10px; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                  📷
+                </div>
+              </div>
+              
+              <a href="#" class="btn" style="width: 100%;">Connect</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 5: Main Interface -->
+    <div class="flow-step">
+      <div class="step-header">
+        <div class="step-number">5</div>
+        <div class="step-title">Main Connection Interface</div>
+      </div>
+      <div class="step-description">
+        Once connected, users see the main interface where they can chat, send heartbeats, 
+        share status updates, and use all the real-time features. This is the core experience 
+        of the app where the connection happens.
+      </div>
+      
+      <div class="main-preview">
+        <img src="/api/placeholder/400/700" alt="Heartbeat Chat Main Interface Preview">
+      </div>
+      
+      <div class="features-list">
+        <h2>Core Features & Interactions</h2>
+        
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <div class="feature-content">
+            <div class="feature-title">Real-Time Messaging</div>
+            <div class="feature-desc">
+              Messages appear instantly with typing indicators and read receipts. The focus is on conversational flow without clutter.
+            </div>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon">❤️</div>
+          <div class="feature-content">
+            <div class="feature-title">Heartbeat Button</div>
+            <div class="feature-desc">
+              Tap the heart button to send a pulse that appears on both screens simultaneously. It's a simple way to say "I'm thinking of you" without words.
+            </div>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon">🎵</div>
+          <div class="feature-content">
+            <div class="feature-title">Synced Music Player</div>
+            <div class="feature-desc">
+              Play music together in perfect sync. When one partner plays a song, the other hears it too, creating a shared moment regardless of distance.
+            </div>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon">✨</div>
+          <div class="feature-content">
+            <div class="feature-title">Night Sky Feature</div>
+            <div class="feature-desc">
+              Tap the star button to open a shared night sky where both partners can add stars. Each star represents a shared moment or memory.
+            </div>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon">💭</div>
+          <div class="feature-content">
+            <div class="feature-title">Status Updates</div>
+            <div class="feature-desc">
+              Share your current mood or status that appears as a floating message on your partner's screen. Perfect for quick updates like "Missing you" or "Thinking of you".
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
